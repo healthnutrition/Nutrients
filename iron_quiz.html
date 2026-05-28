@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Перевірте ризик дефіциту заліза</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --cream: #F5F0E8; --sand: #EDE5D4; --rust: #C4522A;
+    --rust-light: rgba(196,82,42,0.1); --dark: #1C1C1A;
+    --stone: #2E2B27; --muted: #7A6E63; --border: rgba(28,28,26,0.12);
+  }
+  body { background: var(--cream); font-family: 'DM Sans', sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px 16px; }
+  .container { width: 100%; max-width: 480px; }
+  .header { text-align: center; margin-bottom: 32px; animation: fadeUp 0.6s ease both; }
+  .badge { display: inline-block; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; border: 1px solid var(--rust); color: var(--rust); border-radius: 40px; padding: 5px 16px; margin-bottom: 16px; }
+  .header h1 { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 400; color: var(--dark); line-height: 1.3; margin-bottom: 10px; }
+  .header p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+  .progress-wrap { margin-bottom: 28px; animation: fadeUp 0.6s 0.1s ease both; }
+  .progress-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+  .progress-bar { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--rust); border-radius: 2px; transition: width 0.4s ease; }
+  .card { background: white; border-radius: 16px; border: 0.5px solid var(--border); padding: 28px; margin-bottom: 16px; animation: fadeUp 0.5s ease both; }
+  .question-num { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--rust); margin-bottom: 10px; }
+  .question-text { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 400; color: var(--dark); line-height: 1.4; margin-bottom: 20px; }
+  .options { display: flex; flex-direction: column; gap: 8px; }
+  .option { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 10px; border: 0.5px solid var(--border); background: var(--cream); cursor: pointer; transition: all 0.2s ease; font-size: 14px; color: var(--dark); }
+  .option:hover { border-color: var(--rust); background: var(--rust-light); }
+  .option.selected { border-color: var(--rust); background: var(--rust-light); color: var(--rust); font-weight: 500; }
+  .option-dot { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--border); flex-shrink: 0; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; }
+  .option.selected .option-dot { border-color: var(--rust); background: var(--rust); }
+  .option.selected .option-dot::after { content: ''; width: 6px; height: 6px; border-radius: 50%; background: white; }
+  .nav { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 8px; animation: fadeUp 0.5s 0.1s ease both; }
+  .btn { padding: 13px 24px; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; border: none; }
+  .btn-back { background: transparent; border: 0.5px solid var(--border); color: var(--muted); }
+  .btn-back:hover { border-color: var(--muted); color: var(--dark); }
+  .btn-next { background: var(--rust); color: white; flex: 1; }
+  .btn-next:hover { background: #a8421e; }
+  .btn-next:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
+  .result-card { background: white; border-radius: 16px; border: 0.5px solid var(--border); padding: 32px 28px; text-align: center; animation: fadeUp 0.6s ease both; }
+  .result-icon { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 20px; }
+  .result-level { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 10px; }
+  .result-title { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 400; color: var(--dark); line-height: 1.3; margin-bottom: 14px; }
+  .result-text { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 24px; }
+  .result-divider { height: 0.5px; background: var(--border); margin: 20px 0; }
+  .result-action { background: var(--rust-light); border-radius: 10px; padding: 16px; font-size: 14px; color: var(--dark); line-height: 1.6; }
+  .result-action strong { color: var(--rust); }
+  .btn-restart { margin-top: 16px; width: 100%; padding: 13px; border-radius: 10px; border: 0.5px solid var(--border); background: transparent; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--muted); cursor: pointer; transition: all 0.2s; }
+  .btn-restart:hover { color: var(--dark); border-color: var(--muted); }
+  .green-icon { background: rgba(34,139,87,0.1); }
+  .yellow-icon { background: rgba(196,145,42,0.1); }
+  .red-icon { background: rgba(196,82,42,0.1); }
+  .green-level { color: #228B57; }
+  .yellow-level { color: #C4912A; }
+  .red-level { color: var(--rust); }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="badge">Самодіагностика</div>
+    <h1>Чи є у вас ризик дефіциту заліза?</h1>
+    <p>8 питань — і ви дізнаєтесь, чи варто здати феритин</p>
+  </div>
+
+  <div id="quiz-section">
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span id="progress-text">Питання 1 з 8</span>
+        <span id="progress-pct">0%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="card" id="question-card">
+      <div class="question-num" id="q-num">01 / 08</div>
+      <div class="question-text" id="q-text"></div>
+      <div class="options" id="q-options"></div>
+    </div>
+    <div class="nav">
+      <button class="btn btn-back" id="btn-back" onclick="goBack()">← Назад</button>
+      <button class="btn btn-next" id="btn-next" onclick="goNext()" disabled>Далі</button>
+    </div>
+  </div>
+
+  <div id="result-section" class="hidden">
+    <div class="result-card" id="result-card"></div>
+    <button class="btn-restart" onclick="restart()">Пройти ще раз</button>
+  </div>
+</div>
+
+<script>
+const questions = [
+  {
+    text: "Як часто ви їсте червоне м'ясо (яловичина, телятина, баранина)?",
+    options: [
+      { label: "Щодня або через день", score: 0 },
+      { label: "2–3 рази на тиждень", score: 1 },
+      { label: "Рідко — раз на тиждень або менше", score: 2 },
+      { label: "Не їм взагалі", score: 3 }
+    ]
+  },
+  {
+    text: "Як часто їсте субпродукти (печінка, серце, нирки)?",
+    options: [
+      { label: "Раз на тиждень або частіше", score: 0 },
+      { label: "Кілька разів на місяць", score: 1 },
+      { label: "Рідко", score: 2 },
+      { label: "Не їм взагалі", score: 3 }
+    ]
+  },
+  {
+    text: "Як часто їсте рибу, морепродукти або бобові (сочевиця, нут, квасоля)?",
+    options: [
+      { label: "Щодня", score: 0 },
+      { label: "2–3 рази на тиждень", score: 1 },
+      { label: "Рідко", score: 2 },
+      { label: "Майже ніколи", score: 3 }
+    ]
+  },
+  {
+    text: "Чи п'єте каву або чай одразу після їжі — протягом 30–60 хвилин?",
+    options: [
+      { label: "Ні, роблю паузу", score: 0 },
+      { label: "Іноді", score: 1 },
+      { label: "Так, майже завжди", score: 2 }
+    ]
+  },
+  {
+    text: "Чи є у вас рясні менструації?",
+    options: [
+      { label: "Ні, помірні", score: 0 },
+      { label: "Не впевнена", score: 1 },
+      { label: "Так, рясні", score: 2 }
+    ]
+  },
+  {
+    text: "Чи займаєтесь спортом регулярно?",
+    options: [
+      { label: "Ні або дуже рідко", score: 0 },
+      { label: "Так, помірно — 2–3 рази на тиждень", score: 1 },
+      { label: "Так, інтенсивно — майже щодня", score: 2 }
+    ]
+  },
+  {
+    text: "Чи харчуєтесь зараз на зниженій калорійності (дієта, схуднення)?",
+    options: [
+      { label: "Ні", score: 0 },
+      { label: "Так, трохи обмежую", score: 1 },
+      { label: "Так, суттєво обмежую калорії", score: 2 }
+    ]
+  },
+  {
+    text: "Чи відчуваєте такі симптоми: хронічна втома, випадіння волосся, погана концентрація, задишка при навантаженні?",
+    options: [
+      { label: "Ні, все добре", score: 0 },
+      { label: "Іноді буває", score: 1 },
+      { label: "Так, часто і помітно", score: 3 }
+    ]
+  }
+];
+
+const total_q = questions.length;
+let current = 0;
+let answers = new Array(total_q).fill(null);
+
+function render() {
+  const q = questions[current];
+  document.getElementById('q-num').textContent = String(current+1).padStart(2,'0') + ' / 0' + total_q;
+  document.getElementById('q-text').textContent = q.text;
+  const container = document.getElementById('q-options');
+  container.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const div = document.createElement('div');
+    div.className = 'option' + (answers[current] === i ? ' selected' : '');
+    div.innerHTML = `<div class="option-dot"></div><span>${opt.label}</span>`;
+    div.onclick = () => selectOption(i);
+    container.appendChild(div);
+  });
+  const pct = Math.round((current / total_q) * 100);
+  document.getElementById('progress-text').textContent = `Питання ${current+1} з ${total_q}`;
+  document.getElementById('progress-pct').textContent = pct + '%';
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('btn-back').style.visibility = current === 0 ? 'hidden' : 'visible';
+  document.getElementById('btn-next').disabled = answers[current] === null;
+  document.getElementById('btn-next').textContent = current === total_q - 1 ? 'Отримати результат' : 'Далі';
+}
+
+function selectOption(i) {
+  answers[current] = i;
+  render();
+}
+
+function goNext() {
+  if (answers[current] === null) return;
+  if (current < total_q - 1) { current++; render(); }
+  else showResult();
+}
+
+function goBack() {
+  if (current > 0) { current--; render(); }
+}
+
+function showResult() {
+  const total = answers.reduce((sum, ans, qi) => sum + (ans !== null ? questions[qi].options[ans].score : 0), 0);
+  document.getElementById('quiz-section').classList.add('hidden');
+  document.getElementById('result-section').classList.remove('hidden');
+
+  let icon, iconClass, levelClass, levelText, title, text, action;
+
+  if (total <= 5) {
+    icon = '🟢'; iconClass = 'green-icon'; levelClass = 'green-level'; levelText = 'Низький ризик';
+    title = 'Ваш раціон виглядає збалансовано';
+    text = 'Схоже, що залізо у вашому раціоні є в достатній кількості і немає яскраво виражених факторів ризику. Продовжуйте стежити за різноманітністю харчування.';
+    action = 'Раз на рік здавайте <strong>загальний аналіз крові</strong> як базову профілактику. Якщо з\'являться симптоми — додайте <strong>феритин</strong>.';
+  } else if (total <= 11) {
+    icon = '🟡'; iconClass = 'yellow-icon'; levelClass = 'yellow-level'; levelText = 'Є підстави перевірити';
+    title = 'У вашому раціоні або способі життя є фактори ризику';
+    text = 'Є кілька моментів, які можуть знижувати надходження або засвоєння заліза. Це не означає, що дефіцит є — але варто перевірити.';
+    action = 'Рекомендую здати <strong>феритин і загальний аналіз крові</strong>. Якщо є симптоми — не відкладайте. Напишіть мені в особисті <strong>"Залізо"</strong> — розберемося з раціоном разом.';
+  } else {
+    icon = '🔴'; iconClass = 'red-icon'; levelClass = 'red-level'; levelText = 'Високий ризик';
+    title = 'Є серйозні підстави перевірити залізо';
+    text = 'У вашому раціоні та способі життя є кілька факторів, які можуть призводити до дефіциту заліза. Симптоми, які ви відчуваєте, можуть бути пов\'язані з цим.';
+    action = 'Зверніться до лікаря і здайте <strong>феритин і загальний аналіз крові</strong>. Не БАДи — спочатку аналізи. Напишіть мені в особисті <strong>"Залізо"</strong> — допоможу розібратись із раціоном.';
+  }
+
+  document.getElementById('result-card').innerHTML = `
+    <div class="result-icon ${iconClass}">${icon}</div>
+    <div class="result-level ${levelClass}">${levelText}</div>
+    <div class="result-title">${title}</div>
+    <div class="result-text">${text}</div>
+    <div class="result-divider"></div>
+    <div class="result-action">${action}</div>
+  `;
+}
+
+function restart() {
+  current = 0;
+  answers = new Array(total_q).fill(null);
+  document.getElementById('quiz-section').classList.remove('hidden');
+  document.getElementById('result-section').classList.add('hidden');
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
