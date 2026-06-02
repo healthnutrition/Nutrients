@@ -447,6 +447,28 @@ body::before {
   line-height: 1.2;
 }
 
+.btn-ig {
+  display: block;
+  margin-top: 14px;
+  padding: 13px 20px;
+  border-radius: 11px;
+  background: var(--rust);
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  transition: all 0.2s ease;
+}
+
+.btn-ig:hover {
+  background: #9D3D1E;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(184,74,38,0.28);
+}
+
 .btn-restart {
   width: 100%;
   padding: 13px;
@@ -715,7 +737,7 @@ function showResult() {
   document.getElementById('result-section').classList.remove('hidden');
   window.scrollTo({top:0,behavior:'smooth'});
 
-  let levelText, title, text, todoItems, ctaClass, ctaLabelText, ctaContent;
+  let levelText, title, text, todoItems, ctaClass, ctaLabelText, ctaContent, showBtn;
   let scoreColor, ornBg, ornament;
 
   if (total <= 8) {
@@ -730,6 +752,7 @@ function showResult() {
     ctaClass = 'green';
     ctaLabelText = 'Превентивна перевірка раціону';
     ctaContent = 'Якщо хочете перевірити раціон — надішліть щоденник харчування за 5–7 днів, і я розберу, чого може не вистачати.';
+    showBtn = false;
 
   } else if (total <= 17) {
     scoreColor = 'var(--amber)'; ornBg = 'var(--amber-soft)'; ornament = '◑';
@@ -744,6 +767,7 @@ function showResult() {
     ctaClass = 'amber';
     ctaLabelText = 'Аналіз раціону';
     ctaContent = 'Якщо хочете перевірити свій раціон — у мене є послуга аналіз харчування. Надсилаєте щоденник за 5–7 днів, я розбираю що є, чого не вистачає і що змінити через харчування, щоб уникнути дефіцитів у майбутньому. Якщо цікаво — напишіть, розкажу деталі і вартість.';
+    showBtn = true;
 
   } else {
     scoreColor = 'var(--rust)'; ornBg = 'var(--rust-soft)'; ornament = '●';
@@ -758,6 +782,7 @@ function showResult() {
     ctaClass = 'rust';
     ctaLabelText = 'Комплекс здоров\'я';
     ctaContent = 'У вас досить багато факторів ризику, тому радила б підійти до перевірки заліза більш комплексно. У мене є <strong>Комплекс здоров\'я</strong> разом із @dr_iryna_nazarchuk — аналіз раціону плюс лабораторні показники. Якщо хочете дізнатись більше — напишіть, розповім що входить і скільки коштує.';
+    showBtn = true;
   }
 
   document.getElementById('result-card').innerHTML =
@@ -769,7 +794,8 @@ function showResult() {
     '<div class="todo-block"><div class="todo-label">Що зробити</div><ul class="todo-list">' +
     todoItems.map(function(i){ return '<li>' + i + '</li>'; }).join('') +
     '</ul></div>' +
-    '<div class="cta-block ' + ctaClass + '"><div class="cta-label ' + ctaClass + '">' + ctaLabelText + '</div><div class="cta-text">' + ctaContent + '</div></div>';
+    '<div class="cta-block ' + ctaClass + '"><div class="cta-label ' + ctaClass + '">' + ctaLabelText + '</div><div class="cta-text">' + ctaContent + '</div></div>' +
+    (showBtn ? '<a href="https://ig.me/m/ivasiuk_nutrition" target="_blank" class="btn-ig">Дізнатись деталі →</a>' : '');
 }
 
 function restart() {
