@@ -3,192 +3,693 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Перевірте ризик дефіциту заліза</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<title>Чи варто вам перевірити феритин?</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --cream: #F5F0E8; --sand: #EDE5D4; --rust: #C4522A;
-    --rust-light: rgba(196,82,42,0.1); --dark: #1C1C1A;
-    --stone: #2E2B27; --muted: #7A6E63; --border: rgba(28,28,26,0.12);
-  }
-  body { background: var(--cream); font-family: 'DM Sans', sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px 16px; }
-  .container { width: 100%; max-width: 480px; }
-  .header { text-align: center; margin-bottom: 32px; animation: fadeUp 0.6s ease both; }
-  .badge { display: inline-block; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; border: 1px solid var(--rust); color: var(--rust); border-radius: 40px; padding: 5px 16px; margin-bottom: 16px; }
-  .header h1 { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 400; color: var(--dark); line-height: 1.3; margin-bottom: 10px; }
-  .header p { font-size: 14px; color: var(--muted); line-height: 1.6; }
-  .progress-wrap { margin-bottom: 28px; animation: fadeUp 0.6s 0.1s ease both; }
-  .progress-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 8px; }
-  .progress-bar { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
-  .progress-fill { height: 100%; background: var(--rust); border-radius: 2px; transition: width 0.4s ease; }
-  .card { background: white; border-radius: 16px; border: 0.5px solid var(--border); padding: 28px; margin-bottom: 16px; animation: fadeUp 0.5s ease both; }
-  .question-num { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--rust); margin-bottom: 10px; }
-  .question-text { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 400; color: var(--dark); line-height: 1.4; margin-bottom: 20px; }
-  .options { display: flex; flex-direction: column; gap: 8px; }
-  .option { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 10px; border: 0.5px solid var(--border); background: var(--cream); cursor: pointer; transition: all 0.2s ease; font-size: 14px; color: var(--dark); }
-  .option:hover { border-color: var(--rust); background: var(--rust-light); }
-  .option.selected { border-color: var(--rust); background: var(--rust-light); color: var(--rust); font-weight: 500; }
-  .option-dot { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--border); flex-shrink: 0; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; }
-  .option.selected .option-dot { border-color: var(--rust); background: var(--rust); }
-  .option.selected .option-dot::after { content: ''; width: 6px; height: 6px; border-radius: 50%; background: white; }
-  .nav { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 8px; animation: fadeUp 0.5s 0.1s ease both; }
-  .btn { padding: 13px 24px; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; border: none; }
-  .btn-back { background: transparent; border: 0.5px solid var(--border); color: var(--muted); }
-  .btn-back:hover { border-color: var(--muted); color: var(--dark); }
-  .btn-next { background: var(--rust); color: white; flex: 1; }
-  .btn-next:hover { background: #a8421e; }
-  .btn-next:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
-  .result-card { background: white; border-radius: 16px; border: 0.5px solid var(--border); padding: 32px 28px; text-align: center; animation: fadeUp 0.6s ease both; }
-  .result-icon { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 20px; }
-  .result-level { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 10px; }
-  .result-title { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 400; color: var(--dark); line-height: 1.3; margin-bottom: 14px; }
-  .result-text { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 24px; }
-  .result-divider { height: 0.5px; background: var(--border); margin: 20px 0; }
-  .result-action { background: var(--rust-light); border-radius: 10px; padding: 16px; font-size: 14px; color: var(--dark); line-height: 1.6; }
-  .result-action strong { color: var(--rust); }
-  .btn-restart { margin-top: 16px; width: 100%; padding: 13px; border-radius: 10px; border: 0.5px solid var(--border); background: transparent; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--muted); cursor: pointer; transition: all 0.2s; }
-  .btn-restart:hover { color: var(--dark); border-color: var(--muted); }
-  .green-icon { background: rgba(34,139,87,0.1); }
-  .yellow-icon { background: rgba(196,145,42,0.1); }
-  .red-icon { background: rgba(196,82,42,0.1); }
-  .green-level { color: #228B57; }
-  .yellow-level { color: #C4912A; }
-  .red-level { color: var(--rust); }
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-  .hidden { display: none; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --cream: #F7F3EC;
+  --warm-white: #FDFAF5;
+  --sand: #EDE5D4;
+  --rust: #B84A26;
+  --rust-soft: rgba(184,74,38,0.09);
+  --rust-mid: rgba(184,74,38,0.18);
+  --dark: #1A1714;
+  --stone: #3A3530;
+  --muted: #80746A;
+  --border: rgba(26,23,20,0.10);
+  --border-strong: rgba(26,23,20,0.18);
+  --green: #2D6E4E;
+  --green-soft: rgba(45,110,78,0.09);
+  --amber: #A06820;
+  --amber-soft: rgba(160,104,32,0.09);
+}
+
+body {
+  background: var(--cream);
+  font-family: 'Jost', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 16px 60px;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+.container {
+  width: 100%;
+  max-width: 460px;
+  position: relative;
+  z-index: 1;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 36px;
+  animation: riseIn 0.7s cubic-bezier(0.16,1,0.3,1) both;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--rust);
+  border: 0.5px solid var(--rust);
+  border-radius: 100px;
+  padding: 5px 14px;
+  margin-bottom: 18px;
+  font-weight: 500;
+}
+
+.badge-dot {
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--rust);
+  animation: pulse 2s ease infinite;
+}
+
+.header h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 32px;
+  font-weight: 500;
+  color: var(--dark);
+  line-height: 1.25;
+  margin-bottom: 12px;
+  letter-spacing: -0.01em;
+}
+
+.header h1 em {
+  font-style: italic;
+  color: var(--rust);
+}
+
+.header-sub {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.65;
+  max-width: 360px;
+  margin: 0 auto;
+  font-weight: 300;
+}
+
+.progress-wrap {
+  margin-bottom: 24px;
+  animation: riseIn 0.7s 0.1s cubic-bezier(0.16,1,0.3,1) both;
+}
+
+.progress-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.progress-label {
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  font-weight: 400;
+}
+
+.progress-steps {
+  display: flex;
+  gap: 3px;
+}
+
+.step-dot {
+  width: 20px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--border-strong);
+  transition: background 0.3s ease;
+}
+
+.step-dot.done { background: var(--rust); }
+.step-dot.current { background: var(--rust); opacity: 0.5; }
+
+.card {
+  background: var(--warm-white);
+  border-radius: 18px;
+  border: 0.5px solid var(--border);
+  padding: 30px 26px 26px;
+  margin-bottom: 14px;
+  box-shadow: 0 2px 24px rgba(26,23,20,0.04), 0 0 0 0.5px rgba(26,23,20,0.04);
+  animation: riseIn 0.5s cubic-bezier(0.16,1,0.3,1) both;
+}
+
+.q-num {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--rust);
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.q-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--dark);
+  line-height: 1.38;
+  margin-bottom: 8px;
+}
+
+.q-hint {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.55;
+  margin-bottom: 20px;
+  font-weight: 300;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 16px;
+  border-radius: 11px;
+  border: 0.5px solid var(--border-strong);
+  background: var(--cream);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  font-size: 13.5px;
+  color: var(--stone);
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.option:hover {
+  border-color: var(--rust);
+  background: var(--rust-soft);
+  transform: translateX(2px);
+}
+
+.option.selected {
+  border-color: var(--rust);
+  background: var(--rust-soft);
+  color: var(--rust);
+  font-weight: 500;
+}
+
+.opt-circle {
+  width: 17px; height: 17px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-strong);
+  flex-shrink: 0;
+  transition: all 0.18s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.option.selected .opt-circle {
+  border-color: var(--rust);
+  background: var(--rust);
+}
+
+.option.selected .opt-circle::after {
+  content: '';
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: white;
+}
+
+.nav {
+  display: flex;
+  gap: 10px;
+  animation: riseIn 0.5s 0.08s cubic-bezier(0.16,1,0.3,1) both;
+}
+
+.btn {
+  padding: 13px 20px;
+  border-radius: 11px;
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  letter-spacing: 0.03em;
+}
+
+.btn-back {
+  background: transparent;
+  border: 0.5px solid var(--border-strong);
+  color: var(--muted);
+  min-width: 52px;
+}
+
+.btn-back:hover { border-color: var(--muted); color: var(--dark); }
+
+.btn-next {
+  background: var(--rust);
+  color: white;
+  flex: 1;
+}
+
+.btn-next:hover:not(:disabled) {
+  background: #9D3D1E;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(184,74,38,0.28);
+}
+
+.btn-next:disabled {
+  background: var(--border-strong);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+.result-wrap {
+  animation: riseIn 0.7s cubic-bezier(0.16,1,0.3,1) both;
+}
+
+.result-card {
+  background: var(--warm-white);
+  border-radius: 18px;
+  border: 0.5px solid var(--border);
+  padding: 32px 26px;
+  box-shadow: 0 2px 24px rgba(26,23,20,0.04);
+  margin-bottom: 12px;
+}
+
+.result-ornament {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 18px;
+}
+
+.result-level {
+  text-align: center;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+.result-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--dark);
+  line-height: 1.3;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.result-text {
+  font-size: 13.5px;
+  color: var(--muted);
+  line-height: 1.72;
+  margin-bottom: 20px;
+  font-weight: 300;
+}
+
+.result-divider {
+  height: 0.5px;
+  background: var(--border);
+  margin: 20px 0;
+}
+
+.todo-block {
+  background: var(--cream);
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 16px;
+}
+
+.todo-label {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
+.todo-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.todo-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  font-size: 13px;
+  color: var(--stone);
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+.todo-list li::before {
+  content: '—';
+  color: var(--rust);
+  font-size: 12px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.cta-block {
+  border-radius: 12px;
+  padding: 18px;
+  border: 0.5px solid;
+}
+
+.cta-block.green { background: var(--green-soft); border-color: rgba(45,110,78,0.2); }
+.cta-block.amber { background: var(--amber-soft); border-color: rgba(160,104,32,0.2); }
+.cta-block.rust  { background: var(--rust-soft);  border-color: var(--rust-mid); }
+
+.cta-label {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.cta-label.green { color: var(--green); }
+.cta-label.amber { color: var(--amber); }
+.cta-label.rust  { color: var(--rust); }
+
+.cta-text {
+  font-size: 13.5px;
+  color: var(--dark);
+  line-height: 1.65;
+  font-weight: 400;
+}
+
+.cta-text strong { font-weight: 600; }
+
+.warning-card {
+  background: var(--warm-white);
+  border-radius: 18px;
+  border: 0.5px solid var(--border);
+  padding: 24px 26px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 24px rgba(26,23,20,0.04);
+}
+
+.warning-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--dark);
+  margin-bottom: 12px;
+}
+
+.warning-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.warning-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  font-size: 12.5px;
+  color: var(--muted);
+  line-height: 1.5;
+  font-weight: 300;
+}
+
+.warning-list li::before {
+  content: '·';
+  color: var(--rust);
+  font-size: 18px;
+  flex-shrink: 0;
+  line-height: 1.2;
+}
+
+.btn-restart {
+  width: 100%;
+  padding: 13px;
+  border-radius: 11px;
+  border: 0.5px solid var(--border-strong);
+  background: transparent;
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.03em;
+}
+
+.btn-restart:hover { color: var(--dark); border-color: var(--muted); }
+
+.disclaimer {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.6;
+  text-align: center;
+  margin-top: 24px;
+  font-weight: 300;
+  opacity: 0.8;
+}
+
+.hidden { display: none !important; }
+
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
 </style>
 </head>
 <body>
 <div class="container">
+
   <div class="header">
-    <div class="badge">Самодіагностика</div>
-    <h1>Чи є у вас ризик дефіциту заліза?</h1>
-    <p>8 питань — і ви дізнаєтесь, чи варто здати феритин</p>
+    <div class="badge"><span class="badge-dot"></span>Раціон · цикл · тренування</div>
+    <h1>Чи варто вам перевірити <em>феритин?</em></h1>
+    <p class="header-sub">12 питань про харчування, менструацію, донорство, тренування і симптоми. Без самодіагностики — лише фактори, які варто знати.</p>
   </div>
 
   <div id="quiz-section">
     <div class="progress-wrap">
-      <div class="progress-label">
-        <span id="progress-text">Питання 1 з 8</span>
-        <span id="progress-pct">0%</span>
+      <div class="progress-meta">
+        <span class="progress-label" id="progress-text">Питання 1 з 12</span>
       </div>
-      <div class="progress-bar">
-        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
-      </div>
+      <div class="progress-steps" id="progress-steps"></div>
     </div>
+
     <div class="card" id="question-card">
-      <div class="question-num" id="q-num">01 / 08</div>
-      <div class="question-text" id="q-text"></div>
+      <div class="q-num" id="q-num"></div>
+      <div class="q-text" id="q-text"></div>
+      <div class="q-hint" id="q-hint"></div>
       <div class="options" id="q-options"></div>
     </div>
+
     <div class="nav">
-      <button class="btn btn-back" id="btn-back" onclick="goBack()">← Назад</button>
+      <button class="btn btn-back" id="btn-back" onclick="goBack()">←</button>
       <button class="btn btn-next" id="btn-next" onclick="goNext()" disabled>Далі</button>
     </div>
+
+    <p class="disclaimer">Це не діагностика. Результат допомагає зрозуміти, чи є сенс здати аналізи.</p>
   </div>
 
   <div id="result-section" class="hidden">
-    <div class="result-card" id="result-card"></div>
-    <button class="btn-restart" onclick="restart()">Пройти ще раз</button>
+    <div class="result-wrap">
+      <div class="result-card" id="result-card"></div>
+      <button class="btn-restart" onclick="restart()">Пройти ще раз</button>
+    </div>
   </div>
-</div>
 
+</div>
 <script>
 const questions = [
   {
-    text: "Як часто ви їсте червоне м'ясо (яловичина, телятина, баранина)?",
+    text: "Як часто у вашому раціоні є червоне м'ясо?",
+    hint: "Яловичина, телятина, баранина.",
     options: [
-      { label: "Щодня або через день", score: 0 },
+      { label: "2–3 рази на тиждень або частіше", score: 0 },
+      { label: "1 раз на тиждень", score: 1 },
+      { label: "Рідше ніж 1 раз на тиждень", score: 2 },
+      { label: "Не їм", score: 3 }
+    ]
+  },
+  {
+    text: "Чи їсте ви субпродукти?",
+    hint: "Наприклад: печінка, серце, паштет.",
+    options: [
+      { label: "Так, 1–2 рази на тиждень або частіше", score: 0 },
+      { label: "Іноді", score: 1 },
+      { label: "Майже ніколи", score: 2 },
+      { label: "Не їм", score: 3 }
+    ]
+  },
+  {
+    text: "Чи є у вас регулярні рослинні джерела заліза?",
+    hint: "Наприклад: сочевиця, нут, квасоля, гречка, насіння.",
+    options: [
+      { label: "Так, майже щодня", score: 0 },
       { label: "2–3 рази на тиждень", score: 1 },
-      { label: "Рідко — раз на тиждень або менше", score: 2 },
-      { label: "Не їм взагалі", score: 3 }
-    ]
-  },
-  {
-    text: "Як часто їсте субпродукти (печінка, серце, нирки)?",
-    options: [
-      { label: "Раз на тиждень або частіше", score: 0 },
-      { label: "Кілька разів на місяць", score: 1 },
       { label: "Рідко", score: 2 },
-      { label: "Не їм взагалі", score: 3 }
+      { label: "Я не звертаю на це увагу", score: 3 }
     ]
   },
   {
-    text: "Як часто їсте рибу, морепродукти або бобові (сочевиця, нут, квасоля)?",
+    text: "Чи додаєте ви джерело вітаміну C до рослинних джерел заліза?",
+    hint: "Наприклад: перець, ягоди, цитрусові, ківі, капуста.",
     options: [
-      { label: "Щодня", score: 0 },
-      { label: "2–3 рази на тиждень", score: 1 },
-      { label: "Рідко", score: 2 },
-      { label: "Майже ніколи", score: 3 }
+      { label: "Так, часто", score: 0 },
+      { label: "Іноді", score: 1 },
+      { label: "Ні / не знаю", score: 2 }
     ]
   },
   {
-    text: "Чи п'єте каву або чай одразу після їжі — протягом 30–60 хвилин?",
+    text: "Чи п'єте ви каву або чай одразу після основного прийому їжі?",
+    hint: "Йдеться про перші 30–60 хвилин після їжі.",
     options: [
-      { label: "Ні, роблю паузу", score: 0 },
+      { label: "Ні, зазвичай роблю паузу", score: 0 },
       { label: "Іноді", score: 1 },
       { label: "Так, майже завжди", score: 2 }
     ]
   },
   {
-    text: "Чи є у вас рясні менструації?",
+    text: "Як би ви описали свою менструацію?",
+    hint: "Рясні менструації — один із факторів, через який запаси заліза можуть знижуватись швидше.",
     options: [
-      { label: "Ні, помірні", score: 0 },
-      { label: "Не впевнена", score: 1 },
-      { label: "Так, рясні", score: 2 }
+      { label: "Помірна", score: 0 },
+      { label: "Інколи рясна", score: 1 },
+      { label: "Часто рясна", score: 2 },
+      { label: "Складно оцінити", score: 1 }
     ]
   },
   {
-    text: "Чи займаєтесь спортом регулярно?",
-    options: [
-      { label: "Ні або дуже рідко", score: 0 },
-      { label: "Так, помірно — 2–3 рази на тиждень", score: 1 },
-      { label: "Так, інтенсивно — майже щодня", score: 2 }
-    ]
-  },
-  {
-    text: "Чи харчуєтесь зараз на зниженій калорійності (дієта, схуднення)?",
+    text: "Чи здавали ви кров або плазму за останні 6–12 місяців?",
+    hint: "Донорство — це реальна втрата заліза, навіть якщо гемоглобін був у нормі.",
     options: [
       { label: "Ні", score: 0 },
-      { label: "Так, трохи обмежую", score: 1 },
-      { label: "Так, суттєво обмежую калорії", score: 2 }
+      { label: "Так, 1 раз", score: 1 },
+      { label: "Так, кілька разів", score: 2 },
+      { label: "Так, регулярно", score: 3 }
     ]
   },
   {
-    text: "Чи відчуваєте такі симптоми: хронічна втома, випадіння волосся, погана концентрація, задишка при навантаженні?",
+    text: "Чи були у вас вагітність, пологи або грудне вигодовування протягом останніх 12–18 місяців?",
+    hint: "У цей період потреба в залізі може бути вищою, а запаси — нижчими.",
     options: [
-      { label: "Ні, все добре", score: 0 },
-      { label: "Іноді буває", score: 1 },
-      { label: "Так, часто і помітно", score: 3 }
+      { label: "Ні", score: 0 },
+      { label: "Так, але самопочуття стабільне", score: 1 },
+      { label: "Так, є втома / слабкість / випадіння волосся", score: 2 },
+      { label: "Так, і феритин давно не перевіряли", score: 3 }
+    ]
+  },
+  {
+    text: "Чи тренуєтесь ви регулярно?",
+    hint: "",
+    options: [
+      { label: "Ні або дуже рідко", score: 0 },
+      { label: "2–3 рази на тиждень", score: 1 },
+      { label: "4+ рази на тиждень", score: 2 },
+      { label: "Інтенсивні або довгі тренування", score: 3 }
+    ]
+  },
+  {
+    text: "Чи буває, що ви тренуєтесь на фоні низької калорійності або пропусків їжі?",
+    hint: "Тобто тренування є, але їжі, білка або загальної енергії часто не вистачає.",
+    options: [
+      { label: "Ні", score: 0 },
+      { label: "Іноді", score: 1 },
+      { label: "Часто", score: 2 },
+      { label: "Так, це моя звична схема", score: 3 }
+    ]
+  },
+  {
+    text: "Чи є у вас симптоми, які повторюються?",
+    hint: "Наприклад: втома, задишка при навантаженні, випадіння волосся, погана концентрація, холодні руки/ноги.",
+    options: [
+      { label: "Ні", score: 0 },
+      { label: "Іноді", score: 1 },
+      { label: "Так, кілька симптомів", score: 2 },
+      { label: "Так, це помітно впливає на самопочуття", score: 3 }
+    ]
+  },
+  {
+    text: "Чи здавали ви феритин за останні 6–12 місяців?",
+    hint: "",
+    options: [
+      { label: "Так, і показник був у нормі", score: 0 },
+      { label: "Так, але показник був менше 30 нг/мл", score: 3 },
+      { label: "Так, але не пам'ятаю результат", score: 1 },
+      { label: "Ні", score: 2 },
+      { label: "Ні, але є симптоми або рясні менструації", score: 3 }
     ]
   }
 ];
 
-const total_q = questions.length;
+const TOTAL = questions.length;
 let current = 0;
-let answers = new Array(total_q).fill(null);
+let answers = new Array(TOTAL).fill(null);
+
+function buildSteps() {
+  const wrap = document.getElementById('progress-steps');
+  wrap.innerHTML = '';
+  for (let i = 0; i < TOTAL; i++) {
+    const d = document.createElement('div');
+    d.className = 'step-dot' + (i < current ? ' done' : i === current ? ' current' : '');
+    wrap.appendChild(d);
+  }
+}
 
 function render() {
   const q = questions[current];
-  document.getElementById('q-num').textContent = String(current+1).padStart(2,'0') + ' / 0' + total_q;
+  document.getElementById('q-num').textContent =
+    String(current+1).padStart(2,'0') + ' / ' + String(TOTAL).padStart(2,'0');
   document.getElementById('q-text').textContent = q.text;
+  const hintEl = document.getElementById('q-hint');
+  hintEl.textContent = q.hint;
+  hintEl.style.display = q.hint ? 'block' : 'none';
+
   const container = document.getElementById('q-options');
   container.innerHTML = '';
   q.options.forEach((opt, i) => {
     const div = document.createElement('div');
     div.className = 'option' + (answers[current] === i ? ' selected' : '');
-    div.innerHTML = `<div class="option-dot"></div><span>${opt.label}</span>`;
+    div.innerHTML = '<div class="opt-circle"></div><span>' + opt.label + '</span>';
     div.onclick = () => selectOption(i);
     container.appendChild(div);
   });
-  const pct = Math.round((current / total_q) * 100);
-  document.getElementById('progress-text').textContent = `Питання ${current+1} з ${total_q}`;
-  document.getElementById('progress-pct').textContent = pct + '%';
-  document.getElementById('progress-fill').style.width = pct + '%';
+
+  document.getElementById('progress-text').textContent = 'Питання ' + (current+1) + ' з ' + TOTAL;
+  buildSteps();
+
   document.getElementById('btn-back').style.visibility = current === 0 ? 'hidden' : 'visible';
-  document.getElementById('btn-next').disabled = answers[current] === null;
-  document.getElementById('btn-next').textContent = current === total_q - 1 ? 'Отримати результат' : 'Далі';
+  const nextBtn = document.getElementById('btn-next');
+  nextBtn.disabled = answers[current] === null;
+  nextBtn.textContent = current === TOTAL - 1 ? 'Отримати результат' : 'Далі';
 }
 
 function selectOption(i) {
@@ -198,53 +699,85 @@ function selectOption(i) {
 
 function goNext() {
   if (answers[current] === null) return;
-  if (current < total_q - 1) { current++; render(); }
+  if (current < TOTAL - 1) { current++; render(); window.scrollTo({top:0,behavior:'smooth'}); }
   else showResult();
 }
 
 function goBack() {
-  if (current > 0) { current--; render(); }
+  if (current > 0) { current--; render(); window.scrollTo({top:0,behavior:'smooth'}); }
 }
 
 function showResult() {
-  const total = answers.reduce((sum, ans, qi) => sum + (ans !== null ? questions[qi].options[ans].score : 0), 0);
+  const total = answers.reduce((sum, ans, qi) =>
+    sum + (ans !== null ? questions[qi].options[ans].score : 0), 0);
+
   document.getElementById('quiz-section').classList.add('hidden');
   document.getElementById('result-section').classList.remove('hidden');
+  window.scrollTo({top:0,behavior:'smooth'});
 
-  let icon, iconClass, levelClass, levelText, title, text, action;
+  let levelText, title, text, todoItems, ctaClass, ctaLabelText, ctaContent;
+  let scoreColor, ornBg, ornament;
 
-  if (total <= 5) {
-    icon = '🟢'; iconClass = 'green-icon'; levelClass = 'green-level'; levelText = 'Низький ризик';
-    title = 'Ваш раціон виглядає збалансовано';
-    text = 'Схоже, що залізо у вашому раціоні є в достатній кількості і немає яскраво виражених факторів ризику. Продовжуйте стежити за різноманітністю харчування.';
-    action = 'Раз на рік здавайте <strong>загальний аналіз крові</strong> як базову профілактику. Якщо з\'являться симптоми — додайте <strong>феритин</strong>.';
-  } else if (total <= 11) {
-    icon = '🟡'; iconClass = 'yellow-icon'; levelClass = 'yellow-level'; levelText = 'Є підстави перевірити';
-    title = 'У вашому раціоні або способі життя є фактори ризику';
-    text = 'Є кілька моментів, які можуть знижувати надходження або засвоєння заліза. Це не означає, що дефіцит є — але варто перевірити.';
-    action = 'Рекомендую здати <strong>феритин і загальний аналіз крові</strong>. Якщо є симптоми — не відкладайте. Напишіть мені в особисті <strong>"Залізо"</strong> — розберемося з раціоном разом.';
+  if (total <= 8) {
+    scoreColor = 'var(--green)'; ornBg = 'var(--green-soft)'; ornament = '○';
+    levelText = 'Мало факторів для термінової перевірки';
+    title = 'За відповідями не видно очевидного поєднання факторів ризику';
+    text = 'Ваші відповіді не показують сильного сигналу: у раціоні є джерела заліза, немає вираженого поєднання симптомів, рясних менструацій, донорства чи жорстких обмежень. Але це не означає, що феритин точно в нормі — запаси заліза можуть знижуватись поступово і не завжди одразу відчуватись.';
+    todoItems = [
+      'Планово здавайте загальний аналіз крові',
+      'Якщо з\'являться втома, задишка або рясні менструації — обговоріть із лікарем додавання феритину'
+    ];
+    ctaClass = 'green';
+    ctaLabelText = 'Превентивна перевірка раціону';
+    ctaContent = 'Якщо хочете перевірити раціон — надішліть щоденник харчування за 5–7 днів, і я розберу, чого може не вистачати.';
+
+  } else if (total <= 17) {
+    scoreColor = 'var(--amber)'; ornBg = 'var(--amber-soft)'; ornament = '◑';
+    levelText = 'Є кілька факторів, які варто перевірити';
+    title = 'Ваш раціон або спосіб життя можуть впливати на запаси заліза';
+    text = 'Є моменти, які можуть знижувати надходження або засвоєння заліза: мало джерел у раціоні, кава чи чай поруч із їжею, рясні менструації, донорство, тренування або обмеження калорій. Це достатня причина не вгадувати, а перевірити через аналізи.';
+    todoItems = [
+      'Загальний аналіз крові',
+      'Феритин',
+      'За потреби — додаткові показники, які призначить лікар'
+    ];
+    ctaClass = 'amber';
+    ctaLabelText = 'Аналіз раціону';
+    ctaContent = 'Якщо хочете перевірити свій раціон — у мене є послуга аналіз харчування. Надсилаєте щоденник за 5–7 днів, я розбираю що є, чого не вистачає і що змінити через харчування, щоб уникнути дефіцитів у майбутньому. Якщо цікаво — напишіть, розкажу деталі і вартість.';
+
   } else {
-    icon = '🔴'; iconClass = 'red-icon'; levelClass = 'red-level'; levelText = 'Високий ризик';
-    title = 'Є серйозні підстави перевірити залізо';
-    text = 'У вашому раціоні та способі життя є кілька факторів, які можуть призводити до дефіциту заліза. Симптоми, які ви відчуваєте, можуть бути пов\'язані з цим.';
-    action = 'Зверніться до лікаря і здайте <strong>феритин і загальний аналіз крові</strong>. Не БАДи — спочатку аналізи. Напишіть мені в особисті <strong>"Залізо"</strong> — допоможу розібратись із раціоном.';
+    scoreColor = 'var(--rust)'; ornBg = 'var(--rust-soft)'; ornament = '●';
+    levelText = 'Є поєднання факторів — краще не відкладати';
+    title = 'Є підстави перевірити феритин найближчим часом';
+    text = 'Ваші відповіді показують кілька факторів одночасно: можливе низьке надходження заліза, підвищені втрати, тренування на фоні недостатньої енергії або симптоми, що повторюються. При такому поєднанні краще не підбирати добавки навмання — спочатку перевірити показники.';
+    todoItems = [
+      'Загальний аналіз крові і феритин',
+      'Обговоріть із лікарем можливі причини',
+      'Не починайте залізо без аналізів'
+    ];
+    ctaClass = 'rust';
+    ctaLabelText = 'Комплекс здоров\'я';
+    ctaContent = 'У вас досить багато факторів ризику, тому радила б підійти до перевірки заліза більш комплексно. У мене є <strong>Комплекс здоров\'я</strong> разом із @dr_iryna_nazarchuk — аналіз раціону плюс лабораторні показники. Якщо хочете дізнатись більше — напишіть, розповім що входить і скільки коштує.';
   }
 
-  document.getElementById('result-card').innerHTML = `
-    <div class="result-icon ${iconClass}">${icon}</div>
-    <div class="result-level ${levelClass}">${levelText}</div>
-    <div class="result-title">${title}</div>
-    <div class="result-text">${text}</div>
-    <div class="result-divider"></div>
-    <div class="result-action">${action}</div>
-  `;
+  document.getElementById('result-card').innerHTML =
+    '<div class="result-ornament" style="background:' + ornBg + '; color:' + scoreColor + '; font-size:26px; font-family:\'Cormorant Garamond\',serif;">' + ornament + '</div>' +
+    '<div class="result-level" style="color:' + scoreColor + '">' + levelText + '</div>' +
+    '<div class="result-title">' + title + '</div>' +
+    '<div class="result-text">' + text + '</div>' +
+    '<div class="result-divider"></div>' +
+    '<div class="todo-block"><div class="todo-label">Що зробити</div><ul class="todo-list">' +
+    todoItems.map(function(i){ return '<li>' + i + '</li>'; }).join('') +
+    '</ul></div>' +
+    '<div class="cta-block ' + ctaClass + '"><div class="cta-label ' + ctaClass + '">' + ctaLabelText + '</div><div class="cta-text">' + ctaContent + '</div></div>';
 }
 
 function restart() {
   current = 0;
-  answers = new Array(total_q).fill(null);
+  answers = new Array(TOTAL).fill(null);
   document.getElementById('quiz-section').classList.remove('hidden');
   document.getElementById('result-section').classList.add('hidden');
+  window.scrollTo({top:0,behavior:'smooth'});
   render();
 }
 
